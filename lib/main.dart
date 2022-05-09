@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'package:intl/intl.dart';
 
 void main() {
   runApp(
     MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Login(),
     ),
   );
@@ -14,9 +18,21 @@ const Color corPri = Colors.amber;
 const Color corSec = Color(0xFFFAF1A1);
 final Color corBackground = Colors.grey.shade900;
 
+late String usuarioLogado;
+String conectou = '';
+
 // TELA DE LOGIN
-class Login extends StatelessWidget {
-  const Login({Key? key}) : super(key: key);
+class Login extends StatefulWidget {
+  Login({Key? key}) : super(key: key);
+
+  @override
+  State<Login> createState() => _LoginState();
+}
+
+class _LoginState extends State<Login> {
+  TextEditingController emailController = TextEditingController();
+
+  TextEditingController senhaController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -46,11 +62,12 @@ class Login extends StatelessWidget {
 
                   const SizedBox(height: 30), // Espaçamento Vertical 30px
 
-                  const TextField(
-                    // CAMPO USUÁRIO
-                    style: TextStyle(color: corSec),
+                  // CAMPO USUÁRIO
+                  TextField(
+                    controller: emailController,
+                    style: const TextStyle(color: corSec),
                     textAlign: TextAlign.center,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                         label: Text('Digite seu e-mail'),
                         focusColor: Colors.red,
                         labelStyle: TextStyle(color: corPri),
@@ -66,11 +83,13 @@ class Login extends StatelessWidget {
 
                   const SizedBox(height: 25), // Espaçamento Vertical 25px
 
-                  const TextField(
-                    // CAMPO USUÁRIO
-                    style: TextStyle(color: corSec),
+                  // CAMPO USUÁRIO
+                  TextField(
+                    controller: senhaController,
+                    obscureText: true,
+                    style: const TextStyle(color: corSec),
                     textAlign: TextAlign.center,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                         label: Text('Digite sua senha:'),
                         focusColor: Colors.red,
                         labelStyle: TextStyle(color: corPri),
@@ -88,7 +107,38 @@ class Login extends StatelessWidget {
 
                   ElevatedButton(
                     // BOTÃO ENTRAR
-                    onPressed: () {},
+                    onPressed: () {
+                      for (int c = 0; c < Usuario.cadastrados.length; c++) {
+                        print('llop');
+                        // VERIFICAR SE USUÁRIO ESTÁ CADASTRADO
+                        if (Usuario.cadastrados[c].email ==
+                            emailController.text) {
+                          if (Usuario.cadastrados[c].senha ==
+                              senhaController.text) {
+                            conectou = '';
+                            usuarioLogado = Usuario.cadastrados[c].nome;
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Denuncias(),
+                              ),
+                            );
+                          } else {
+                            print('ok');
+                            setState(() {
+                              conectou = 'Senha incorreta';
+                            });
+                          }
+                        } else {
+                          print('ok2');
+
+                          setState(() {
+                            conectou = 'Conta não cadastrada';
+                          });
+                        }
+                      }
+                    },
+
                     child: const Text(
                       'Entrar',
                       style: TextStyle(fontSize: 18),
@@ -103,10 +153,16 @@ class Login extends StatelessWidget {
                   TextButton(
                       // BOTÃO DE TEXTO, CADASTRAR
                       onPressed: () {
+                        setState(() {
+                          conectou = '';
+                          emailController.clear();
+                          senhaController.clear();
+                        });
+
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const Cadastro(),
+                            builder: (context) => Cadastro(),
                           ),
                         );
                       },
@@ -115,6 +171,11 @@ class Login extends StatelessWidget {
                 ],
               ),
             ),
+            const SizedBox(height: 25),
+            Text(
+              ' $conectou',
+              style: const TextStyle(color: Colors.red),
+            )
           ],
         ),
       ),
@@ -124,7 +185,11 @@ class Login extends StatelessWidget {
 
 // TELA DE CADASTRO
 class Cadastro extends StatelessWidget {
-  const Cadastro({Key? key}) : super(key: key);
+  Cadastro({Key? key}) : super(key: key);
+
+  TextEditingController nomeController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController senhaController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -159,11 +224,12 @@ class Cadastro extends StatelessWidget {
 
                   const SizedBox(height: 30), // Espaçamento Vertical 25px
 
-                  const TextField(
+                  TextField(
                     // CAMPO NOME
-                    style: TextStyle(color: corSec),
+                    controller: nomeController,
+                    style: const TextStyle(color: corSec),
                     textAlign: TextAlign.center,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                         label: Text('Preencha seu nome'),
                         focusColor: Colors.red,
                         labelStyle: TextStyle(color: corPri),
@@ -179,11 +245,12 @@ class Cadastro extends StatelessWidget {
 
                   const SizedBox(height: 25), // Espaçamento Vertical 25px
 
-                  const TextField(
+                  TextField(
                     // CAMPO E-MAIL
-                    style: TextStyle(color: corSec),
+                    controller: emailController,
+                    style: const TextStyle(color: corSec),
                     textAlign: TextAlign.center,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                         label: Text('Preenche seu e-mail'),
                         focusColor: Colors.red,
                         labelStyle: TextStyle(color: corPri),
@@ -198,11 +265,13 @@ class Cadastro extends StatelessWidget {
                   ),
                   const SizedBox(height: 25), // Espaçamento Vertical 25px
 
-                  const TextField(
+                  TextField(
                     // CAMPO SENHA
-                    style: TextStyle(color: corSec),
+                    controller: senhaController,
+                    obscureText: true,
+                    style: const TextStyle(color: corSec),
                     textAlign: TextAlign.center,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                         label: Text('Crie uma senha'),
                         focusColor: Colors.red,
                         labelStyle: TextStyle(color: corPri),
@@ -217,8 +286,39 @@ class Cadastro extends StatelessWidget {
                   ),
                   const SizedBox(height: 25), // Espaçamento Vertical 25px
                   ElevatedButton(
-                    // BOTÃO ENTRAR
-                    onPressed: () {},
+                    // BOTÃO CADASTRAR
+                    onPressed: () {
+                      if (emailController.text.isNotEmpty &&
+                          nomeController.text.isNotEmpty &&
+                          senhaController.text.isNotEmpty) {
+                        Usuario newUsuario = Usuario(
+                            email: emailController.text,
+                            nome: nomeController.text,
+                            senha: senhaController.text);
+                        Usuario.cadastrados.add(newUsuario);
+
+                        showDialog<String>(
+                          context: context,
+                          builder: (BuildContext context) => AlertDialog(
+                            title: const Text('Cadastrado com sucesso'),
+                            content: const Text(
+                                'Agora você já pode conectar e fazer denúncias!'),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context, 'OK');
+                                  Navigator.pop(context);
+                                },
+                                child: const Text(
+                                  'OK',
+                                  style: TextStyle(color: corPri),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                    },
                     child: const Text(
                       'Cadastrar',
                       style: TextStyle(fontSize: 18),
@@ -532,8 +632,8 @@ class CartaoDenuncia extends StatelessWidget {
                           style: const TextStyle(
                               fontSize: 12, color: Colors.white)),
                       const SizedBox(height: 7),
-                      const Text('Usuário: André',
-                          style: TextStyle(
+                      Text('Usuário: $usuarioLogado',
+                          style: const TextStyle(
                               fontSize: 16,
                               color: corPri,
                               fontWeight: FontWeight.bold)),
@@ -574,4 +674,6 @@ class Usuario {
     required this.email,
     required this.senha,
   });
+
+  static List<Usuario> cadastrados = [];
 }
